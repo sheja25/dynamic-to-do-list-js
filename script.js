@@ -1,40 +1,57 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('registration-form');
-    const feedbackDiv = document.getElementById('form-feedback');
+document.addEventListener('DOMContentLoaded', function(){
+    const addButton = document.getElementById('add-task-btn');
+    const taskInput = document.getElementById('task-input');
+    const taskList = document.getElementById('task-list');
 
-    form.addEventListener('submit', function(event) {
-        event.preventDefault();
-
-        const username = document.getElementById('username').value.trim();
-        const email = document.getElementById('email').value.trim();
-        const password = document.getElementById('password').value.trim();
-
-        let isValid = true;
-        const messages = [];
-
-        if (username.length < 3) {
-            isValid = false;
-            messages.push('Username must be at least 3 characters long.');
+    function addTask(){
+        const taskText = taskInput.value.trim();
+        
+        if (taskInput === ""){
+            alert('Enter a new task');
         }
 
-        if (!email.includes('@') || !email.includes('.')) {
-            isValid = false;
-            messages.push('Please enter a valid email address.');
+        const listItem = document.createElement('li');
+        listItem.textContent = taskText;
+
+        const removeButton = document.createElement('button');
+        removeButton.textContent = "Remove";
+        removeButton.classList.add('remove-btn');
+
+        removeButton.onclick = function(){
+            taskList.removeChild(listItem);
         }
 
-        if (password.length < 8) {
-            isValid = false;
-            messages.push('Password must be at least 8 characters long.');
-        }
+        listItem.append(removeButton);
+        taskList.appendChild(listItem);
+        taskInput.value = "";
+    }
 
-        feedbackDiv.style.display = 'block';
+    addButton.addEventListener('click', addTask);
 
-        if (isValid) {
-            feedbackDiv.textContent = 'Registration successful!';
-            feedbackDiv.style.color = '#28a745';
-        } else {
-            feedbackDiv.innerHTML = messages.join('<br>');
-            feedbackDiv.style.color = '#dc3545';
+    taskInput.addEventListener('keypress', function(event){
+        if(event.key === 'Enter'){
+            addTask();
         }
     });
+    
+    
+
+    //Implementation of Local Storage for the To-Do List
+
+    function loadTask(){
+        const storedTasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+        storedTasks.forEach(taskText => addTask(taskText, false));
+    }
+
+    function addTask(taskText, save = true){
+        if (save){
+            const storedTasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+            storedTasks.push(taskText);
+            localStorage.setItem('tasks', JSON.stringify(storedTasks));
+        }
+    }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadTasks();
 });
